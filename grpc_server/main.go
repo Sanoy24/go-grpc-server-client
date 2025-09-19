@@ -8,6 +8,7 @@ import (
 	pb "simplegrpcserver/proto/gen"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 type server struct {
@@ -27,8 +28,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	cred, error := credentials.NewServerTLSFromFile("cert.pem", "key.pem")
+	if error != nil {
+		log.Fatal("could not load tls keys")
+	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.Creds(cred))
 	pb.RegisterCalculateServer(grpcServer, &server{})
 
 	log.Printf("server running... on port %s", port)
