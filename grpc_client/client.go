@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	mainapipb "grpcclient/proto/gen"
 	"log"
+	"os"
 	"time"
 
 	"google.golang.org/grpc"
@@ -12,7 +15,19 @@ import (
 )
 
 func main() {
-	cred, err := credentials.NewClientTLSFromFile("cert.pem", "")
+
+	cert, err := os.ReadFile("cert.pem")
+	if err != nil {
+		log.Fatal("failed to read the cert.pem: ", err)
+	}
+	certPool := x509.NewCertPool()
+	if !certPool.AppendCertsFromPEM(cert) {
+		log.Fatal("failed to append cert to pool")
+	}
+	tlsConfig := &tls.Config{
+		RootCAs: certPool,
+	}
+	cred := credentials.NewTLS(tlsConfig)
 	if err != nil {
 		log.Fatal("err: ", err)
 	}
