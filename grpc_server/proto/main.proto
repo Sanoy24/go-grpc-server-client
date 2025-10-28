@@ -1,4 +1,5 @@
 syntax = "proto3";
+import "greater.proto";
 
 package calculator;
 
@@ -6,6 +7,10 @@ option go_package = "/proto/gen;mainapipb";
 
 service Calculate {
     rpc Add (AddRequest) returns (AddResponse);
+}
+
+service Greeter {
+    rpc Greet (HelloRequest) returns (HelloResponse);
 }
 
 message AddRequest {

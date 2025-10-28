@@ -8,7 +8,6 @@ import (
 	pb "simplegrpcserver/proto/gen"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 type server struct {
@@ -26,18 +25,24 @@ func main() {
 	port := ":50051"
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Fatal(err)
-	}
-	cred, error := credentials.NewServerTLSFromFile("cert.pem", "key.pem")
-	if error != nil {
-		log.Fatal("could not load tls keys")
+		log.Fatalf("failed to listen: %v", err) // Changed log.Fatal to log.Fatalf for better formatting
 	}
 
-	grpcServer := grpc.NewServer(grpc.Creds(cred))
+	// --- REMOVE TLS/Certificate Setup ---
+	// The following lines are removed:
+	// cred, error := credentials.NewServerTLSFromFile("cert.pem", "key.pem")
+	// if error != nil {
+	//     log.Fatal("could not load tls keys")
+	// }
+
+	// Initialize the gRPC server without credentials (insecure)
+	// The grpc.Creds(cred) option is removed.
+	grpcServer := grpc.NewServer() // No arguments needed for an insecure server
+
 	pb.RegisterCalculateServer(grpcServer, &server{})
 
 	log.Printf("server running... on port %s", port)
 	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatal(err)
+		log.Fatalf("server failed to serve: %v", err)
 	}
 }
