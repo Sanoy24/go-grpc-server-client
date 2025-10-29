@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 
@@ -12,12 +13,19 @@ import (
 
 type server struct {
 	pb.UnimplementedCalculateServer
+	pb.UnimplementedGreeterServer
 }
 
 func (s *server) Add(ctx context.Context, req *pb.AddRequest) (*pb.AddResponse, error) {
 	Sum := req.A + req.B
 	return &pb.AddResponse{
 		Sum: Sum,
+	}, nil
+}
+
+func (s *server) Greet(ctx context.Context, req *pb.HelloRequest) (*pb.HelloResponse, error) {
+	return &pb.HelloResponse{
+		Message: fmt.Sprintf("Hello, %s", req.Name),
 	}, nil
 }
 
@@ -40,6 +48,7 @@ func main() {
 	grpcServer := grpc.NewServer() // No arguments needed for an insecure server
 
 	pb.RegisterCalculateServer(grpcServer, &server{})
+	pb.RegisterGreeterServer(grpcServer, &server{})
 
 	log.Printf("server running... on port %s", port)
 	if err := grpcServer.Serve(lis); err != nil {

@@ -18,6 +18,7 @@ func main() {
 	}
 	defer conn.Close()
 	client := pb.NewCalculateClient(conn)
+	clientTwo := pb.NewGreeterClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -25,11 +26,19 @@ func main() {
 		A: 2,
 		B: 5,
 	}
+	reqTwo := &pb.HelloRequest{
+		Name: "Yonas",
+	}
+	resTwo, errTwo := clientTwo.Greet(ctx, reqTwo)
 	res, err := client.Add(ctx, &req)
 	if err != nil {
 		log.Fatalln("err: ", err)
 	}
+	if errTwo != nil {
+		log.Fatalln("err: ", errTwo)
+	}
 	fmt.Println("-- response -- ", res.Sum)
+	fmt.Println("---| response |---", resTwo.Message)
 	state := conn.GetState()
 	fmt.Println("--| state |--", state)
 }
