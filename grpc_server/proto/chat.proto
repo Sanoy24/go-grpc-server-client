@@ -1,0 +1,22 @@
+syntax = "proto3";
+package chat;
+
+option go_package = "/proto/gen/chat;chatapi";
+
+// simple text messages
+message Message {
+    string sender = 1;
+    string text = 2;
+}
+
+// streaming service
+service ChatService {
+    // unary
+    rpc SayHello(Message) returns (Message);
+    // server streaming
+    rpc ChatStream(Message) returns (stream Message);
+    // client streaming
+    rpc SendStream (stream Message) returns (Message);
+    // Biderectional streaming
+    rpc FullChat (stream Message) returns (stream Message);
+}
